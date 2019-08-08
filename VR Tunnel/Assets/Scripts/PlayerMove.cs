@@ -6,21 +6,20 @@ public class PlayerMove : MonoBehaviour
 {
     //Public Variables
     public float moveSpeed; //The speed, set in the editor
-    public float rotationSpeed; //The speed of tunnel rotation
-    public GameObject Door; //The GameObject that rotates everything
+    public float rotationStepAmount; //The amount the player rotates per repeat
+    public int counter; //The amount of repeats per player rotation
     //Static Variables
     public static float speed; //The actual speed
     //Private Variables
     private int preTouchCount; //The TouchCount of the last frame
+    private int counterProgress = 0; //The progress of a player rotation
+    private bool onTop = false; //Is the player is on the "top" of the tunnel?
     private bool tapping = false; //Records if the player tapped that frame
-    
-    private int switcher = 0; 
-
-    private int counter = 30; 
 
     void Start()
     {
         speed = moveSpeed;
+        counterProgress = counter;
     }
 
     void Update()
@@ -37,36 +36,26 @@ public class PlayerMove : MonoBehaviour
             }
         }
         preTouchCount = Input.touchCount;
-        //Update "starts" here ----
-        /* if(Input.GetKeyDown(KeyCode.Space) || tapping)
-        {
-            OpenDoor();
-        }*/ 
+        //Update "starts" here
         if(Input.GetKeyDown(KeyCode.Space) || tapping)
         {
-            switcher++; 
-        }
-        if(switcher > 0) 
-        {
-            for(int i = 0; i < counter; i++)
+            if(counterProgress == counter)
             {
-                //OpenDoor(); 
-                switcher = 0; 
+                counterProgress = 0;
+                if(onTop)
+                {
+                    Physics.gravity = new Vector3(0, -9.81f, 0);
+                    onTop = false;
+                } else {
+                    Physics.gravity = new Vector3(0, 9.81f, 0);
+                    onTop = true;
+                }
             }
-          
         }
-    }
-    void OpenDoor() //Function for when the door needs do be opened
-    {
-        Quaternion newRotation = Quaternion.AngleAxis(-90, Vector3.up);
-        Door.transform.rotation = Quaternion.Slerp(Door.transform.rotation, newRotation, 0.05f);
+        if(counterProgress < counter)
+        {
+            transform.Rotate(0, 0, rotationStepAmount, Space.Self);
+            counterProgress++;
+        }
     }
 }
-
-
-
-    /* void AxisTurn()
-    {
-        Quaternion newRotation = Quaternion.AngleAxis(-10, new Vector3(1, 0, 0));
-        rotationAxis.transform.rotation = Quaternion.Slerp(rotationAxis.transform.rotation, newRotation, rotationSpeed * Time.deltaTime); //Switches gravity
-    } */
