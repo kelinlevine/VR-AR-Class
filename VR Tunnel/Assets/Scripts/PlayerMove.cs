@@ -4,17 +4,25 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float moveSpeed;
-    public static float speed;
-    private int preTouchCount;
-    private bool tapping = false;
-    // Start is called before the first frame update
+    //Public Variables
+    public float moveSpeed; //The speed, set in the editor
+    public float rotationSpeed; //The speed of tunnel rotation
+    public GameObject Door; //The GameObject that rotates everything
+    //Static Variables
+    public static float speed; //The actual speed
+    //Private Variables
+    private int preTouchCount; //The TouchCount of the last frame
+    private bool tapping = false; //Records if the player tapped that frame
+    
+    private int switcher = 0; 
+
+    private int counter = 30; 
+
     void Start()
     {
         speed = moveSpeed;
     }
 
-    // Update is called once per frame
     void Update()
     {
         //Checking if it's tapping
@@ -29,10 +37,36 @@ public class PlayerMove : MonoBehaviour
             }
         }
         preTouchCount = Input.touchCount;
-        //Update "starts" here
+        //Update "starts" here ----
+        /* if(Input.GetKeyDown(KeyCode.Space) || tapping)
+        {
+            OpenDoor();
+        }*/ 
         if(Input.GetKeyDown(KeyCode.Space) || tapping)
         {
-            Debug.Log(Input.touchCount);
+            switcher++; 
+        }
+        if(switcher > 0) 
+        {
+            for(int i = 0; i < counter; i++)
+            {
+                //OpenDoor(); 
+                switcher = 0; 
+            }
+          
         }
     }
+    void OpenDoor() //Function for when the door needs do be opened
+    {
+        Quaternion newRotation = Quaternion.AngleAxis(-90, Vector3.up);
+        Door.transform.rotation = Quaternion.Slerp(Door.transform.rotation, newRotation, 0.05f);
+    }
 }
+
+
+
+    /* void AxisTurn()
+    {
+        Quaternion newRotation = Quaternion.AngleAxis(-10, new Vector3(1, 0, 0));
+        rotationAxis.transform.rotation = Quaternion.Slerp(rotationAxis.transform.rotation, newRotation, rotationSpeed * Time.deltaTime); //Switches gravity
+    } */
